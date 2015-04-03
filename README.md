@@ -39,20 +39,25 @@ New Relic Insights expects key/value pairs.
 As a convenience, the Insights Object will flatten Object and Array data.
 
 Adding this data object:
+
+```
 insights.add({
   'purchase': {
     "account":3,
     "amount":259.54
   }
 }, 'purchase');
+```
 
 Actually flattens out and is sent like this:
+```
 {
   'appId': 42,
   'eventType': 'purchase',
   'purchase.account':3,
   'purchase.amount':259.54
 }
+```
 
 
 ## tests
