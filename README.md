@@ -61,6 +61,26 @@ Actually flattens out and is sent like this:
 }
 ```
 
+Array data flattens out too:
+
+```
+  insights.add({
+    'randomWords': [ "card", "bean", "chair", "box" ]
+  });
+```
+
+but it is less pretty:
+```
+{
+  'appId': 42,
+  'eventType': 'data',
+  'randomWords.0': 'card',
+  'randomWords.1': 'bean',
+  'randomWords.2': 'chair',
+  'randomWords.3': 'box'
+}
+```
+
 ### event types
 When you add data, you can specify the eventType that is sent to New Relic.
 If you don't specify the eventType, the defaultEventType (from the initial config is used).

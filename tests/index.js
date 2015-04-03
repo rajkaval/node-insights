@@ -109,6 +109,27 @@ describe('node-insights', function(){
     }, 1000);
   });
 
+  it('should send flattened array data', function(done){
+    var body;
+    var scope = nock('https://insights-collector.newrelic.com')
+                  .post('/v1/accounts/123456/events')
+                  .reply(200, function(uri, reqBody){
+                    body = reqBody;
+                    return body;
+                  });
+    var insights = new Insights(config);
+    insights.add({
+      'randomWords': [ "card", "bean", "chair", "box" ]
+      });
+    insights.send();
+    setTimeout(function(){
+      expect(scope.isDone()).to.be.true;
+      expect(body).to.eql('[{"appId":42,"eventType":"test-data","randomWords.0":"card","randomWords.1":"bean","randomWords.2":"chair","randomWords.3":"box"}]');
+      done();
+    }, 1000);
+  });
+
+
   it('should be stoppable', function(){
     var scope = nock('https://insights-collector.newrelic.com').post('/v1/accounts/123456/events').reply(200, { });
     var insights = new Insights(config);
