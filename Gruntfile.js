@@ -10,11 +10,33 @@ module.exports = function (grunt) {
     settings: {
     },
 
+    clean: {
+      node: ['./node_modules'],
+      coverage: {
+        src: ['./coverage']
+      }
+    },
+
     env : {
       options : {
       },
       test : {
         NODE_ENV : 'test'
+      }
+    },
+
+    exec: {
+      istanbul: {
+        cmd: function () {
+          var files = [
+            grunt.file.expand('database/tests/*.js').join(' '),
+            grunt.file.expand('database/models/tests/*.js').join(' '),
+            grunt.file.expand('tests/*.js').join(' ')
+          ];
+          var cover = 'istanbul cover --x "" node_modules/mocha/bin/_mocha -- --timeout 60000 --reporter spec' + files.join(' ');
+          var report = 'istanbul' + ' report ' + 'cobertura';
+          return cover + ' && ' + report;
+        }
       }
     },
 
@@ -31,6 +53,8 @@ module.exports = function (grunt) {
     },
 
   });
+
+  grunt.registerTask('coverage', ['clean:coverage', 'env:test', 'exec:istanbul']);
 
   grunt.registerTask('test', 'Run Tests', function () {
     grunt.task.run(['env:test', 'cafemocha:all']);

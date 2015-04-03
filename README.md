@@ -31,12 +31,14 @@ insights.add({
 
 ```
 
-## Adding Data
+## adding data
 
 By default, adding data will start the send timer.
+Data is held in the queue until either the number of items exceeds maxPending or the send timer goes off.
 
+### data format
 New Relic Insights expects key/value pairs.
-As a convenience, the Insights Object will flatten Object and Array data.
+As a convenience, the Insights object will flatten Object and Array data.
 
 Adding this data object:
 
@@ -59,6 +61,14 @@ Actually flattens out and is sent like this:
 }
 ```
 
+### event types
+When you add data, you can specify the eventType that is sent to New Relic.
+If you don't specify the eventType, the defaultEventType (from the initial config is used).
+The defaultEventType **defaults** to the string 'data'. Awesome!
+
+```
+insight.add({ ... }, 'my-custom-event-type');
+```
 
 ## tests
 
