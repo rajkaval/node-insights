@@ -66,3 +66,6 @@ Run the tests
 ```shell
 grunt test
 ```
+
+## resources
+[New Relic Docs](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/inserting-custom-events-insights-api)
