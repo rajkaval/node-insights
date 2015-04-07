@@ -1,6 +1,6 @@
 # node-insights
 
-Submit data to New Relic Insights
+Submit and query New Relic Insights data.
 
 ## installation
 
@@ -18,7 +18,8 @@ var Insights = require('node-insights');
 var insights = new Insights({
   appId: <YOUR_APP_ID>,
   insertKey: '<YOUR_INSERT_KEY>',
-  url: 'https://insights-collector.newrelic.com/v1/accounts/<YOUR_ACCOUNT_ID>/events'
+  queryKey: '<YOUR_QUERY_KEY>',
+  accountId: '<YOUR_ACCOUNT_ID>'
 });
 
 insights.add({
@@ -27,6 +28,10 @@ insights.add({
   someObject: {
     'foo': 'bar'
   }
+});
+
+insights.query('SELECT count(*) FROM data', function(err, responseBody) {
+  // ...
 });
 
 ```
@@ -87,7 +92,16 @@ If you don't specify the eventType, the defaultEventType (from the initial confi
 The defaultEventType **defaults** to the string 'data'. Awesome!
 
 ```
-insight.add({ ... }, 'my-custom-event-type');
+insights.add({ ... }, 'my-custom-event-type');
+```
+
+### querying data
+To retrieve data from Insights you will need to use your [query key](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/querying-your-data-remotely#register) to execute NRQL queries.
+
+```
+insights.query(nrqlQuery, function(err, responseBody) {
+  // ...
+});
 ```
 
 ## tests
@@ -98,4 +112,5 @@ grunt test
 ```
 
 ## resources
-[New Relic Docs](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/inserting-custom-events-insights-api)
+New Relic docs about [inserting custom events](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/inserting-custom-events-insights-api) and [default attributes](https://docs.newrelic.com/docs/insights/new-relic-insights/decorating-events/insights-attributes)
+
