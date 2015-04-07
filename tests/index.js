@@ -14,7 +14,6 @@ describe('node-insights', function(){
       insertKey: "xyz",
       queryKey: "abc",
       accountId: "123456",
-      appId: 42,
       timerInterval: 500,
       maxPending: 5,
       defaultEventType: 'test-data'
@@ -24,17 +23,7 @@ describe('node-insights', function(){
   it('should throw an Error if no accountId is supplied', function(){
     expect(function(){
       new Insights({
-        insertKey: "xyz",
-        appId: 42
-      });
-    }).to.throw(Error);
-  });
-
-  it('should throw an Error if no appId is supplied', function(){
-    expect(function(){
-      new Insights({
-        insertKey: "xyz",
-        accountId: "<YOUR ACCOUNT ID>",
+        insertKey: "xyz"
       });
     }).to.throw(Error);
   });
@@ -80,7 +69,6 @@ describe('node-insights', function(){
 
   it('should throw an Error if no insertKey is supplied when adding data', function(){
     var insights = new Insights({
-      appId: 42,
       accountId: "<YOUR ACCOUNT ID>",
     });
 
@@ -107,7 +95,7 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
-      expect(body).to.eql('[{"appId":42,"eventType":"purchase","purchase.account":3,"purchase.amount":259.54}]');
+      expect(body).to.eql('[{"eventType":"purchase","purchase.account":3,"purchase.amount":259.54}]');
       done();
     }, 1000);
   });
@@ -127,7 +115,7 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
-      expect(body).to.eql('[{"appId":42,"eventType":"test-data","randomWords.0":"card","randomWords.1":"bean","randomWords.2":"chair","randomWords.3":"box"}]');
+      expect(body).to.eql('[{"eventType":"test-data","randomWords.0":"card","randomWords.1":"bean","randomWords.2":"chair","randomWords.3":"box"}]');
       done();
     }, 1000);
   });
@@ -180,7 +168,6 @@ describe('node-insights', function(){
 
   it('should throw an Error if no queryKey is supplied when querying data', function(){
     var insights = new Insights({
-      appId: 42,
       accountId: "<YOUR ACCOUNT ID>",
     });
 

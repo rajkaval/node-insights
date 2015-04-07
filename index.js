@@ -8,7 +8,6 @@ function Insights(config){
 
   this.config = _.assign({
     accountId: null,
-    appId: null,
     enabled: true,
     insertKey: '',
     queryKey: '',
@@ -18,10 +17,6 @@ function Insights(config){
     baseURL: null,
     url: null
   }, config);
-
-  if (!_.isNumber(config.appId)){
-    throw new Error('Missing app id');
-  }
 
   if(_.isEmpty(this.config.accountId)){
     throw new Error('Missing account ID');
@@ -113,7 +108,6 @@ Insights.prototype.add = function(data, eventType){
   try {
 
     var insight = _.reduce(data, reducer(""), {
-      "appId": that.config.appId,
       "eventType": eventType || that.config.defaultEventType
     });
 
