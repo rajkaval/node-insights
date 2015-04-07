@@ -7,31 +7,34 @@ var logger = console;
 function Insights(config){
 
   this.config = _.assign({
+    accountId: null,
     appId: null,
     enabled: true,
     insertKey: '',
+    queryKey: '',
     timerInterval: 10000,
     maxPending: 100,
     defaultEventType: 'data',
-    url: ''
+    baseURL: null,
+    url: null
   }, config);
-
-  if (_.isEmpty(config.insertKey)){
-    throw new Error('Missing insert key');
-  }
-
-  if(_.isEmpty(config.url)){
-    throw new Error('Missing url');
-  }
 
   if (!_.isNumber(config.appId)){
     throw new Error('Missing app id');
   }
 
+  if(_.isEmpty(this.config.accountId)){
+    throw new Error('Missing account ID');
+  }
+
   this.data = [];
   this.timerId = null;
   this.timerCallback = _.bind(this.send, this);
+  this.urlPathPrefix = '/v1/accounts/' + this.config.accountId + '/';
 }
+
+Insights.collectorBaseURL = "https://insights-collector.newrelic.com";
+Insights.queryBaseURL = "https://insights-api.newrelic.com";
 
 //start the timer that will send insights after some interval of time
 //this is called implicitly when data is added via the add method
@@ -61,7 +64,7 @@ Insights.prototype.send = function(){
         headers: {
           "X-Insert-Key": this.config.insertKey
         },
-        url: that.config.url,
+        url: (Insights.collectorBaseURL + that.urlPathPrefix + "events"),
         body: that.data
       }, function(err, res, body){
         that.data.length = 0;
@@ -102,6 +105,10 @@ function reducer(prefix){
 //Add insights data to the queue.
 //It is sent when the queue reaches a max size or a period of time has elapsed
 Insights.prototype.add = function(data, eventType){
+  if (_.isEmpty(this.config.insertKey)){
+    throw new Error('Missing insert key');
+  }
+
   var that = this;
   try {
 
@@ -125,6 +132,33 @@ Insights.prototype.add = function(data, eventType){
     logger.error('Insights Add Exception:', x);
     that.data.length = 0;
   }
+};
+
+Insights.prototype.query = function(query, done) {
+  if (_.isEmpty(this.config.queryKey)){
+    throw new Error('Missing query key');
+  }
+
+  try {
+    decodeURIComponent(query);
+  }
+  catch(ex) {
+    query = encodeURI(query);
+  }
+
+  var url = Insights.queryBaseURL + this.urlPathPrefix + "query?nrql=" + query;
+
+  request({
+    method: 'GET',
+    json: true,
+    headers: {
+      "X-Query-Key": this.config.queryKey
+    },
+    url: url,
+  }, function(err, res, body){
+    done(err, body);
+  });
+
 };
 
 module.exports = Insights;
