@@ -1,6 +1,6 @@
 {
   "name": "node-insights",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Submit and query New Relic Insights data",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^3.6.0",
-    "request": "^2.54.0",
-    "rewire": "^2.3.1"
+    "request": "^2.54.0"
   },
   "devDependencies": {
     "chai": "^2.2.0",
@@ -34,6 +33,7 @@
     "load-grunt-tasks": "^3.1.0",
     "mocha": "^2.2.1",
     "nock": "^1.4.0",
-    "time-grunt": "^1.1.0"
+    "time-grunt": "^1.1.0",
+    "rewire": "^2.3.1"
   }
 }
