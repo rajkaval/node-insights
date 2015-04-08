@@ -4,6 +4,7 @@
 var expect = require('chai').expect;
 var Insights = require('../index.js');
 var nock = require('nock');
+var rewire = require('rewire');
 
 describe('node-insights', function(){
 
@@ -189,6 +190,41 @@ describe('node-insights', function(){
       done();
     });
 
+  });
+
+
+  it('can handle consecutive adds', function(done){
+    var requestCount = 0;
+    var mockRequest = function(options, callback){
+      expect(options.body.length).to.equal(5);
+      setTimeout(function(){
+        requestCount++;
+        if(requestCount == 4){
+          setTimeout(function(){
+            expect(requestCount).to.equal(4);
+            done();
+          }, 200);
+        }
+        callback(null, {
+          statusCode: 200
+        }, 'mock');
+      }, 10);
+    };
+    var Insights = rewire('../index.js');
+
+    Insights.__set__("request", mockRequest);
+
+    var insights = new Insights({
+      insertKey: "xyz",
+      url: "https://insights-collector.newrelic.com/v1/accounts/123456/events",
+      accountId: "90210",
+      timerInterval: 1000000000,
+      maxPending: 5
+    });
+
+    for(var i = 0; i < 20; i++){
+      insights.add({name: 'test'}, 'testing');
+    }
   });
 
   it('should have more tests');
