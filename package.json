@@ -21,7 +21,8 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^3.6.0",
-    "request": "^2.54.0"
+    "request": "^2.54.0",
+    "rewire": "^2.3.1"
   },
   "devDependencies": {
     "chai": "^2.2.0",

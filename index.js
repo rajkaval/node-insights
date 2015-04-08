@@ -52,6 +52,8 @@ Insights.prototype.stop = function(){
 Insights.prototype.send = function(){
   var that = this;
   if (that.config.enabled && that.data.length > 0){
+    var bodyData = that.data;
+    that.data = [];
     try {
       request({
         method: 'POST',
@@ -60,9 +62,8 @@ Insights.prototype.send = function(){
           "X-Insert-Key": this.config.insertKey
         },
         url: (Insights.collectorBaseURL + that.urlPathPrefix + "events"),
-        body: that.data
+        body: bodyData
       }, function(err, res, body){
-        that.data.length = 0;
         if (err){
           logger.error('Error sending to insights', err);
         }
@@ -72,7 +73,6 @@ Insights.prototype.send = function(){
       });
     }
     catch(x){
-      that.data.length = 0;
       logger.error(x);
     }
   }
@@ -114,7 +114,7 @@ Insights.prototype.add = function(data, eventType){
     logger.log('Insights data', insight);
     that.data.push(insight);
 
-    if (that.data.length > that.config.maxPending){
+    if (that.data.length >= that.config.maxPending){
       that.stop();
       that.send();
     }
