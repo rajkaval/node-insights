@@ -132,11 +132,106 @@ Insights.prototype.add = function(data, eventType){
   }
 };
 
+Insights.prototype.nrql = function(params) {
+  if(params.constructor == String) {
+    return params
+  }
+
+  if(!params.select) {
+    throw "parameters must include :select"
+  }
+  if(!params.from) {
+    throw "parameters must include :from"
+  }
+
+  var nrql = "SELECT " + params.select
+  nrql += " FROM " + params.from
+  if(params.where) {
+    nrql += " WHERE " + this.where(params.where)
+  }
+  if(params.since) {
+    nrql += " SINCE " + params.since
+  }
+  if(params.until) {
+    nrql += " UNTIL " + params.until
+  }
+  if(params.facet) {
+    nrql += " FACET " + params.facet
+  }
+  if(params.timeseries) {
+    nrql += " TIMESERIES " + params.timeseries
+  }
+  if(params.limit) {
+    nrql += " LIMIT " + params.limit
+  }
+  if(params.compare) {
+    nrql += " COMPARE WITH " + params.compare
+  }
+
+  return nrql
+}
+
+Insights.prototype.where = function(clause) {
+  var quote = function(value) { return "'"+value+"'" }
+
+  if(clause == null) {
+    return null
+  }
+
+  if(clause.constructor == String) {
+    return "("+clause+")"
+  }
+  else if(clause.constructor == Array) {
+    var clauses = []
+    for(var i = 0; i < clause.length; i++) {
+      clauses.push(this.where(clause[i]))
+    }
+    return clauses.join(" AND ")
+  }
+
+  var segments = []
+  for(var key in clause) {
+    if(clause.hasOwnProperty(key)) {
+      var value = clause[key]
+      var segment = ""
+
+      if(value.constructor == Array) {
+        var quotedValues = []
+        for(var i = 0; i < value.length; i++) {
+          var x = value[i]
+          if(x.constructor !== Number) {
+            x = quote(x)
+          }
+          quotedValues.push(x)
+        }
+        segment += key+" IN ("
+        segment += quotedValues.join(",")
+        segment += ")"
+      }
+      else {
+        if (value.constructor !== Number) {
+          value = quote(value);
+        }
+        segment += key+" = "+value;
+      }
+      segments.push(segment)
+    }
+  }
+
+  if(segments.length > 0) {
+    return "("+segments.join(" AND ")+")"
+  }
+  else {
+    return null
+  }
+}
+
 Insights.prototype.query = function(query, done) {
   if (_.isEmpty(this.config.queryKey)){
     throw new Error('Missing query key');
   }
 
+  query = this.nrql(query);
   try {
     decodeURIComponent(query);
   }

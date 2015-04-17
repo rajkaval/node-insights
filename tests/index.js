@@ -278,5 +278,44 @@ describe('node-insights', function(){
     }
   });
 
+  it('should construct nrql from objects', function(done) {
+    var insights = new Insights(config);
+    var nrql = insights.nrql({
+      select: 'uniqueCount(session), count(*)',
+      from: 'PageView',
+      since: '1 day ago',
+      where: {userAgentOS: ['Windows', 'Mac']},
+      facet: 'countryCode',
+      limit: 100
+    });
+
+    expect(nrql).to.eql("SELECT uniqueCount(session), count(*) FROM PageView "+
+          "WHERE (userAgentOS IN ('Windows','Mac')) SINCE 1 day ago "+
+          "FACET countryCode LIMIT 100");
+
+    nrql = insights.nrql({
+      select: 'uniqueCount(session)',
+      from: 'PageView',
+      since: '1 week ago',
+      until: '1 day ago',
+      timeseries: '1 hour'
+    });
+
+    expect(nrql).to.eql("SELECT uniqueCount(session) FROM PageView "+
+          "SINCE 1 week ago UNTIL 1 day ago TIMESERIES 1 hour");
+
+    done();
+  });
+
+  it('should construct where clauses form objects', function(done) {
+    var insights = new Insights(config);
+    var where;
+
+    where = insights.where({a: 1, b: 'banana', c: ['d', 'e']});
+    expect(where).to.eql("(a = 1 AND b = 'banana' AND c IN ('d','e'))");
+
+    done();
+  });
+
   it('should have more tests');
 });
