@@ -87,6 +87,7 @@ describe('node-insights', function(){
                     return body;
                   });
     var insights = new Insights(config);
+    var addTime = Date.now();
     insights.add({
       'purchase': {
         "account":3,
@@ -96,7 +97,17 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
-      expect(body).to.eql('[{"eventType":"purchase","purchase.account":3,"purchase.amount":259.54}]');
+
+      var parsedBody = JSON.parse(body);
+      expect(parsedBody).to.have.length(1);
+
+      var processedInsight = parsedBody[0];
+      expect(Object.keys(processedInsight).sort()).to.eql(['eventType', 'purchase.account', 'purchase.amount', 'timestamp'].sort());
+      expect(processedInsight.eventType).to.eql('purchase');
+      expect(processedInsight['purchase.account']).to.eql(3);
+      expect(processedInsight['purchase.amount']).to.eql(259.54);
+      expect(processedInsight.timestamp).to.be.at.least(addTime);
+
       done();
     }, 1000);
   });
@@ -110,17 +121,57 @@ describe('node-insights', function(){
                     return body;
                   });
     var insights = new Insights(config);
+    var addTime = Date.now()
     insights.add({
       'randomWords': [ "card", "bean", "chair", "box" ]
       });
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
-      expect(body).to.eql('[{"eventType":"test-data","randomWords.0":"card","randomWords.1":"bean","randomWords.2":"chair","randomWords.3":"box"}]');
+
+      var parsedBody = JSON.parse(body);
+      expect(parsedBody).to.have.length(1);
+
+      var parsedInsight = parsedBody[0];
+      expect(Object.keys(parsedInsight).sort()).to.eql(['eventType', 'randomWords.0', 'randomWords.1', 'randomWords.2', 'randomWords.3', 'timestamp']);
+      expect(parsedInsight.eventType).to.eql('test-data');
+      expect(parsedInsight['randomWords.0']).to.eql('card');
+      expect(parsedInsight['randomWords.1']).to.eql('bean');
+      expect(parsedInsight['randomWords.2']).to.eql('chair');
+      expect(parsedInsight['randomWords.3']).to.eql('box');
+      expect(parsedInsight.timestamp).to.be.at.least(addTime);
+
       done();
     }, 1000);
   });
 
+  it('should not overwrite a user defined timestamp', function(done){
+    var body;
+    var scope = nock(Insights.collectorBaseURL)
+                  .post('/v1/accounts/123456/events')
+                  .reply(200, function(uri, reqBody){
+                    body = reqBody;
+                    return body;
+                  });
+    var insights = new Insights(config);
+    insights.add({
+      'timestamp': 5
+    });
+    insights.send();
+    setTimeout(function(){
+      expect(scope.isDone()).to.be.true;
+
+      var parsedBody = JSON.parse(body);
+      expect(parsedBody).to.have.length(1);
+
+      var parsedInsight = parsedBody[0];
+      expect(Object.keys(parsedInsight).sort()).to.eql(['eventType', 'timestamp']);
+      expect(parsedInsight.eventType).to.eql('test-data');
+      expect(parsedInsight.timestamp).to.eql(5)
+
+      done();
+    }, 1000);
+  });
 
   it('should be stoppable', function(){
     var scope = nock(Insights.collectorBaseURL).post('/v1/accounts/123456/events').reply(200, { });
