@@ -278,6 +278,30 @@ describe('node-insights', function(){
     }
   });
 
+  it('should throw an error if no params are supplied to nrql', function(){
+    expect(function(){
+      var insights = new Insights(config);
+      insights.nrql();
+    }).to.throw(Error);
+  });
+
+  it('should throw an error if select param is not supplied to nrql', function(){
+    expect(function(){
+      var insights = new Insights(config);
+      insights.nrql({
+      });
+    }).to.throw(Error);
+  });
+
+  it('should throw an error if from param is not supplied to nrql', function(){
+    expect(function(){
+      var insights = new Insights(config);
+      insights.nrql({
+        select: 'uniqueCount(session), count(*)'
+      });
+    }).to.throw(Error);
+  });
+
   it('should construct nrql from objects', function(done) {
     var insights = new Insights(config);
     var nrql = insights.nrql({
