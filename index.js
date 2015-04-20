@@ -111,6 +111,10 @@ Insights.prototype.add = function(data, eventType){
       "eventType": eventType || that.config.defaultEventType
     });
 
+    if (insight.timestamp === undefined) {
+      insight.timestamp = Date.now();
+    }
+
     logger.log('Insights data', insight);
     that.data.push(insight);
 

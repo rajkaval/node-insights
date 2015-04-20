@@ -95,6 +95,11 @@ The defaultEventType **defaults** to the string 'data'. Awesome!
 insights.add({ ... }, 'my-custom-event-type');
 ```
 
+### timestamps
+By default Insights will use the time data is sent to the server as the timestamp. Because this library buffers data for up to 10s, we will automatically add a timestamp when you call `insights.add()`.
+
+If you provide your own timestamp (keeping in mind the date has to be within a day of the Insight server's time), the library will not overwrite the user provided one.
+
 ### querying data
 To retrieve data from Insights you will need to use your [query key](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/querying-your-data-remotely#register) to execute NRQL queries.
 
