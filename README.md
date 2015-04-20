@@ -34,6 +34,19 @@ insights.query('SELECT count(*) FROM data', function(err, responseBody) {
   // ...
 });
 
+// you can construct NRQL from objects using a similar pattern to Rails ActiveRecord, etc.
+var q = { select : 'count(*)', from: 'PageView',
+          where  : { userAgentOS: ['Windows', 'Mac'] },
+          since  : '1 day ago', facet: 'countryCode'};
+
+
+// nrql == "SELECT count(*) FROM PageView WHERE userAgentOs IN ('Windows', 'Mac') SINCE 1 day ago FACET countryCode"
+var nrql = insights.nrql(q);
+
+// will generate nrql from q and run normally
+insights.query(q, function(err, responseBody) {
+    // ...
+})
 ```
 
 ## adding data
@@ -118,4 +131,3 @@ grunt test
 
 ## resources
 New Relic docs about [inserting custom events](https://docs.newrelic.com/docs/insights/new-relic-insights/adding-querying-data/inserting-custom-events-insights-api) and [default attributes](https://docs.newrelic.com/docs/insights/new-relic-insights/decorating-events/insights-attributes)
-
