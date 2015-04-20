@@ -12,7 +12,7 @@ function Insights(config){
     insertKey: '',
     queryKey: '',
     timerInterval: 10000,
-    maxPending: 100,
+    maxPending: 1000,
     defaultEventType: 'data',
     baseURL: null,
     url: null
