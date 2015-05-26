@@ -9,6 +9,7 @@ function Insights(config){
   this.config = _.assign({
     accountId: null,
     enabled: true,
+    logger: logger,
     insertKey: '',
     queryKey: '',
     timerInterval: 10000,
@@ -65,15 +66,15 @@ Insights.prototype.send = function(){
         body: bodyData
       }, function(err, res, body){
         if (err){
-          logger.error('Error sending to insights', err);
+          that.config.logger.error('Error sending to insights', err);
         }
         else if (res){
-          logger.log('Insights response', res.statusCode, body);
+          that.config.logger.log('Insights response', res.statusCode, body);
         }
       });
     }
     catch(x){
-      logger.error(x);
+      that.config.logger.error(x);
     }
   }
 };
@@ -115,7 +116,7 @@ Insights.prototype.add = function(data, eventType){
       insight.timestamp = Date.now();
     }
 
-    logger.log('Insights data', insight);
+    that.config.logger.log('Insights data', insight);
     that.data.push(insight);
 
     if (that.data.length >= that.config.maxPending){
@@ -127,7 +128,7 @@ Insights.prototype.add = function(data, eventType){
     }
   }
   catch(x){
-    logger.error('Insights Add Exception:', x);
+    that.config.logger.error('Insights Add Exception:', x);
     that.data.length = 0;
   }
 };
