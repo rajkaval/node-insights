@@ -85,7 +85,7 @@ function reducer(prefix){
       insight[prefix + key] = value;
     }
     else if (_.isPlainObject(value) || _.isArray(value)){
-      _.reduce(value, reducer(key + '.'), insight);
+      _.reduce(value, reducer(prefix + key + '.'), insight);
     }
     else if (_.isBoolean(value) || _.isDate(value)){
       insight[prefix + key] = value.toString();
