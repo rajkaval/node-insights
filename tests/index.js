@@ -145,6 +145,105 @@ describe('node-insights', function(){
     }, 1000);
   });
 
+  it('should send flattened object/array data', function(done){
+    var body;
+    var scope = nock(Insights.collectorBaseURL)
+      .post('/v1/accounts/123456/events')
+      .reply(200, function(uri, reqBody){
+        body = reqBody;
+        return body;
+      });
+    var insights = new Insights(config);
+    var addTime = Date.now();
+    insights.add({
+      'trip': {
+        'referenceNumber': 'ABC123',
+        'legs': [
+          {
+            'flights': [
+              {
+                'airlineCode': 'UA',
+                'flightNumber': '123',
+                'departure': {
+                  'airportCode': 'PDX'
+                },
+                'arrival': {
+                  'airportCode': 'SEA'
+                }
+              },
+              {
+                'airlineCode': 'AA',
+                'flightNumber': '987',
+                'departure': {
+                  'airportCode': 'SEA'
+                },
+                'arrival': {
+                  'airportCode': 'ORD'
+                }
+              }
+            ]
+          },
+          {
+            'flights': [
+              {
+                'airlineCode': 'AS',
+                'flightNumber': '456',
+                'departure': {
+                  'airportCode': 'ORD'
+                },
+                'arrival': {
+                  'airportCode': 'PDX'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
+    insights.send();
+    setTimeout(function(){
+      expect(scope.isDone()).to.be.true;
+
+      var parsedBody = JSON.parse(body);
+      expect(parsedBody).to.have.length(1);
+
+      var parsedInsight = parsedBody[0];
+      expect(Object.keys(parsedInsight).sort()).to.eql([
+        'eventType',
+        'timestamp',
+        'trip.legs.0.flights.0.airlineCode',
+        'trip.legs.0.flights.0.arrival.airportCode',
+        'trip.legs.0.flights.0.departure.airportCode',
+        'trip.legs.0.flights.0.flightNumber',
+        'trip.legs.0.flights.1.airlineCode',
+        'trip.legs.0.flights.1.arrival.airportCode',
+        'trip.legs.0.flights.1.departure.airportCode',
+        'trip.legs.0.flights.1.flightNumber',
+        'trip.legs.1.flights.0.airlineCode',
+        'trip.legs.1.flights.0.arrival.airportCode',
+        'trip.legs.1.flights.0.departure.airportCode',
+        'trip.legs.1.flights.0.flightNumber',
+        'trip.referenceNumber']);
+      expect(parsedInsight.eventType).to.eql('test-data');
+      expect(parsedInsight.timestamp).to.be.at.least(addTime);
+      expect(parsedInsight['trip.legs.0.flights.0.airlineCode']).to.eql('UA');
+      expect(parsedInsight['trip.legs.0.flights.0.arrival.airportCode']).to.eql('SEA');
+      expect(parsedInsight['trip.legs.0.flights.0.departure.airportCode']).to.eql('PDX');
+      expect(parsedInsight['trip.legs.0.flights.0.flightNumber']).to.eql('123');
+      expect(parsedInsight['trip.legs.0.flights.1.airlineCode']).to.eql('AA');
+      expect(parsedInsight['trip.legs.0.flights.1.arrival.airportCode']).to.eql('ORD');
+      expect(parsedInsight['trip.legs.0.flights.1.departure.airportCode']).to.eql('SEA');
+      expect(parsedInsight['trip.legs.0.flights.1.flightNumber']).to.eql('987');
+      expect(parsedInsight['trip.legs.1.flights.0.airlineCode']).to.eql('AS');
+      expect(parsedInsight['trip.legs.1.flights.0.arrival.airportCode']).to.eql('PDX');
+      expect(parsedInsight['trip.legs.1.flights.0.departure.airportCode']).to.eql('ORD');
+      expect(parsedInsight['trip.legs.1.flights.0.flightNumber']).to.eql('456');
+      expect(parsedInsight['trip.referenceNumber']).to.eql('ABC123');
+
+      done();
+    }, 1000);
+  });
+
   it('should not overwrite a user defined timestamp', function(done){
     var body;
     var scope = nock(Insights.collectorBaseURL)
