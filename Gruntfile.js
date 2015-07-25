@@ -12,6 +12,7 @@ module.exports = function (grunt) {
 
     clean: {
       node: ['./node_modules'],
+      docs: ['./docs'],
       coverage: {
         src: ['./coverage']
       }
@@ -52,9 +53,19 @@ module.exports = function (grunt) {
       }
     },
 
+    jsdoc : {
+      dist : {
+        src: ['*.js', '!Gruntfile.js'],
+        options: {
+          destination: 'docs'
+        }
+      }
+    }
+
   });
 
   grunt.registerTask('coverage', ['clean:coverage', 'env:test', 'exec:istanbul']);
+  grunt.registerTask('docs', [ 'clean:docs', 'jsdoc' ]);
 
   grunt.registerTask('test', 'Run Tests', function () {
     grunt.task.run(['env:test', 'cafemocha:all']);

@@ -1,6 +1,6 @@
 {
   "name": "node-insights",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Submit and query New Relic Insights data",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,7 @@
     "grunt-contrib-clean": "^0.6.0",
     "grunt-env": "^0.4.4",
     "grunt-exec": "^0.4.6",
+    "grunt-jsdoc": "^0.6.7",
     "load-grunt-tasks": "^3.1.0",
     "mocha": "^2.2.1",
     "nock": "^1.4.0",

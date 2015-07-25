@@ -430,7 +430,7 @@ describe('node-insights', function(){
     done();
   });
 
-  it('should construct where clauses form objects', function(done) {
+  it('should construct where clauses from objects', function(done) {
     var insights = new Insights(config);
     var where;
 
