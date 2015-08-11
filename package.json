@@ -1,6 +1,6 @@
 {
   "name": "node-insights",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Submit and query New Relic Insights data",
   "main": "index.js",
   "scripts": {

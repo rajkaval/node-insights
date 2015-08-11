@@ -9,10 +9,18 @@ var logger = console;
  * @constructor
  * @param {Object} config - configuration object
  * @param {string} config.accountId - your newrelic insights account id
+ * @param {string} config.insertKey - your newrelic insert key
+ * @param {string} config.queryKey - your newrelic query key
+ * @param {integer} [config.timerInterval=10000] - the timer interval (in milliseconds) that is used for sending data
+ * @param {integer} [config.maxPending=1000] - the maximum number of items held in the queue before being sent
+ * @param {string} [config.defaultEventType='data'] - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
+ * @param {boolean} [config.enabled=true] - enable/disable the sending of insights data.
  *
  * @example
  *    new Insights({
  *      accountId: '...',
+ *      insertKey: '...',
+ *      queryKey: '...',
  *    });
  *
  */
@@ -26,9 +34,7 @@ function Insights(config){
     queryKey: '',
     timerInterval: 10000,
     maxPending: 1000,
-    defaultEventType: 'data',
-    baseURL: null,
-    url: null
+    defaultEventType: 'data'
   }, config);
 
   if(_.isEmpty(this.config.accountId)){
@@ -123,11 +129,12 @@ function reducer(prefix){
 * @param {string} [eventType] - event type to associate with data
 */
 Insights.prototype.add = function(data, eventType){
+  var that = this;
+
   if (_.isEmpty(this.config.insertKey)){
     throw new Error('Missing insert key');
   }
 
-  var that = this;
   try {
 
     var insight = _.reduce(data, reducer(""), {

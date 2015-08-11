@@ -10,7 +10,7 @@ npm install node-insights --save
 
 ## usage
 
-Create an Insights instance and pass in an object with your New Relic app id, insert key, and url.
+Create an Insights instance and pass in an object with your New Relic app id, insert key, and query key.
 
 For more information about NewRelic Insights Docs : https://docs.newrelic.com/docs/insights/new-relic-insights
 

@@ -115,7 +115,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -140,10 +144,248 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">your newrelic insights account id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>insertKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">your newrelic insert key</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>queryKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">your newrelic query key</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timerInterval</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    10000
+                
+                </td>
+            
+
+            <td class="description last">the timer interval (in milliseconds) that is used for sending data</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxPending</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">integer</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1000
+                
+                </td>
+            
+
+            <td class="description last">the maximum number of items held in the queue before being sent</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>defaultEventType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    'data'
+                
+                </td>
+            
+
+            <td class="description last">when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>enabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">enable/disable the sending of insights data.</td>
         </tr>
 
     
@@ -191,7 +433,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line19">line 19</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line27">line 27</a>
     </li></ul></dd>
     
 
@@ -220,6 +462,8 @@
     
     <pre class="prettyprint"><code>new Insights({
      accountId: '...',
+     insertKey: '...',
+     queryKey: '...',
    });</code></pre>
 
 
@@ -391,7 +635,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line125">line 125</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -522,7 +766,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line171">line 171</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line178">line 178</a>
     </li></ul></dd>
     
 
@@ -691,7 +935,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line279">line 279</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line286">line 286</a>
     </li></ul></dd>
     
 
@@ -773,7 +1017,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line71">line 71</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -856,7 +1100,7 @@ this is called implicitly when data is added via the add method
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line51">line 51</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -939,7 +1183,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line61">line 61</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -1021,7 +1265,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line218">line 218</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -1069,7 +1313,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sat Jul 25 2015 09:58:17 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Aug 11 2015 13:22:29 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
