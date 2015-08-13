@@ -45,10 +45,20 @@ function Insights(config){
   this.timerId = null;
   this.timerCallback = _.bind(this.send, this);
   this.urlPathPrefix = '/v1/accounts/' + this.config.accountId + '/';
+
+  Object.defineProperty(this, 'enabled', {
+    get: function () {
+      return this.config.enabled;
+    },
+    set: function(val){
+      this.config.enabled = val;
+    }
+  });
 }
 
-Insights.collectorBaseURL = "https://insights-collector.newrelic.com";
-Insights.queryBaseURL = "https://insights-api.newrelic.com";
+Insights.collectorBaseURL = 'https://insights-collector.newrelic.com';
+Insights.queryBaseURL = 'https://insights-api.newrelic.com';
+
 
 /**
 * Start the timer that will send insights after some interval of time
@@ -76,28 +86,27 @@ Insights.prototype.stop = function(){
  */
 Insights.prototype.send = function(){
   var that = this;
+  var bodyData;
   if (that.config.enabled && that.data.length > 0){
-    var bodyData = that.data;
+    bodyData = that.data;
     that.data = [];
     try {
       request({
         method: 'POST',
         json: true,
         headers: {
-          "X-Insert-Key": this.config.insertKey
+          'X-Insert-Key': this.config.insertKey
         },
-        url: (Insights.collectorBaseURL + that.urlPathPrefix + "events"),
+        url: (Insights.collectorBaseURL + that.urlPathPrefix + 'events'),
         body: bodyData
       }, function(err, res, body){
         if (err){
           that.config.logger.error('Error sending to insights', err);
-        }
-        else if (res){
+        } else if (res){
           that.config.logger.log('Insights response', res.statusCode, body);
         }
       });
-    }
-    catch(x){
+    } catch(x){
       that.config.logger.error(x);
     }
   }
@@ -107,14 +116,11 @@ function reducer(prefix){
   return function(insight, value, key){
     if (_.isString(value) || _.isNumber(value)){
       insight[prefix + key] = value;
-    }
-    else if (_.isPlainObject(value) || _.isArray(value)){
+    } else if (_.isPlainObject(value) || _.isArray(value)){
       _.reduce(value, reducer(prefix + key + '.'), insight);
-    }
-    else if (_.isBoolean(value) || _.isDate(value)){
+    } else if (_.isBoolean(value) || _.isDate(value)){
       insight[prefix + key] = value.toString();
-    }
-    else {
+    } else {
       //ignore functions, nulls, undefineds
       logger.warn('not reducing', prefix, key, value);
     }
@@ -130,6 +136,7 @@ function reducer(prefix){
 */
 Insights.prototype.add = function(data, eventType){
   var that = this;
+  var insight;
 
   if (_.isEmpty(this.config.insertKey)){
     throw new Error('Missing insert key');
@@ -137,8 +144,8 @@ Insights.prototype.add = function(data, eventType){
 
   try {
 
-    var insight = _.reduce(data, reducer(""), {
-      "eventType": eventType || that.config.defaultEventType
+    insight = _.reduce(data, reducer(''), {
+      'eventType': eventType || that.config.defaultEventType
     });
 
     if (insight.timestamp === undefined) {
@@ -151,12 +158,10 @@ Insights.prototype.add = function(data, eventType){
     if (that.data.length >= that.config.maxPending){
       that.stop();
       that.send();
-    }
-    else {
+    } else {
       that.start();
     }
-  }
-  catch(x){
+  } catch(x){
     that.config.logger.error('Insights Add Exception:', x);
     that.data.length = 0;
   }
@@ -176,8 +181,10 @@ Insights.prototype.add = function(data, eventType){
  *   insights.query(nrql);
  */
 Insights.prototype.nrql = function(params) {
+  var nrql;
+
   if (!params){
-    throw new Error("Missing nrql parameters");
+    throw new Error('Missing nrql parameters');
   }
 
   if(_.isString(params)) {
@@ -186,34 +193,34 @@ Insights.prototype.nrql = function(params) {
   }
 
   if(!params.select) {
-    throw new Error("Parameters must include :select");
+    throw new Error('Parameters must include :select');
   }
   if(!params.from) {
-    throw new Error("Parameters must include :from");
+    throw new Error('Parameters must include :from');
   }
 
-  var nrql = "SELECT " + params.select;
-  nrql += " FROM " + params.from;
+  nrql = 'SELECT ' + params.select;
+  nrql += ' FROM ' + params.from;
   if(params.where) {
-    nrql += " WHERE " + this.where(params.where);
+    nrql += ' WHERE ' + this.where(params.where);
   }
   if(params.since) {
-    nrql += " SINCE " + params.since;
+    nrql += ' SINCE ' + params.since;
   }
   if(params.until) {
-    nrql += " UNTIL " + params.until;
+    nrql += ' UNTIL ' + params.until;
   }
   if(params.facet) {
-    nrql += " FACET " + params.facet;
+    nrql += ' FACET ' + params.facet;
   }
   if(params.timeseries) {
-    nrql += " TIMESERIES " + params.timeseries;
+    nrql += ' TIMESERIES ' + params.timeseries;
   }
   if(params.limit) {
-    nrql += " LIMIT " + params.limit;
+    nrql += ' LIMIT ' + params.limit;
   }
   if(params.compare) {
-    nrql += " COMPARE WITH " + params.compare;
+    nrql += ' COMPARE WITH ' + params.compare;
   }
 
   return nrql;
@@ -223,59 +230,56 @@ Insights.prototype.nrql = function(params) {
  * nrql where clause builder
  */
 Insights.prototype.where = function(clause) {
-  var i;
+  var i, x, key, value, segment, quotedValues;
   var quote = function(value) { return "'"+value+"'"; };
+  var clauses = [];
+  var segments = [];
 
   if(!clause) {
     return null;
   }
 
   if(_.isString(clause)) {
-    return "("+clause+")";
-  }
-  else if(_.isArray(clause)) {
-    var clauses = [];
+    return '(' + clause + ')';
+  } else if(_.isArray(clause)) {
     for(i = 0; i < clause.length; i++) {
       clauses.push(this.where(clause[i]));
     }
-    return clauses.join(" AND ");
+    return clauses.join(' AND ');
   }
 
-  var segments = [];
-  for(var key in clause) {
+  for(key in clause) {
     if(clause.hasOwnProperty(key)) {
-      var value = clause[key];
-      var segment = "";
+      value = clause[key];
+      segment = '';
 
       if(_.isArray(value)) {
-        var quotedValues = [];
+        quotedValues = [];
         for(i = 0; i < value.length; i++) {
-          var x = value[i];
+          x = value[i];
           if(!_.isNumber(x)) {
             x = quote(x);
           }
           quotedValues.push(x);
         }
-        segment += key+" IN (";
-        segment += quotedValues.join(",");
-        segment += ")";
-      }
-      else {
+        segment += key + ' IN (';
+        segment += quotedValues.join(',');
+        segment += ')';
+      } else {
         if (!_.isNumber(value)) {
           value = quote(value);
         }
-        segment += key+" = "+value;
+        segment += key + ' = ' + value;
       }
       segments.push(segment);
     }
   }
 
   if(segments.length > 0) {
-    return "("+segments.join(" AND ")+")";
+    return '(' + segments.join(' AND ') + ')';
   }
-  else {
-    return null;
-  }
+
+  return null;
 };
 
 /**
@@ -284,6 +288,8 @@ Insights.prototype.where = function(clause) {
  * @param {function} done - callback
  */
 Insights.prototype.query = function(query, done) {
+  var url;
+
   if (_.isEmpty(this.config.queryKey)){
     throw new Error('Missing query key');
   }
@@ -291,20 +297,19 @@ Insights.prototype.query = function(query, done) {
   query = this.nrql(query);
   try {
     decodeURIComponent(query);
-  }
-  catch(ex) {
+  } catch(ex) {
     query = encodeURI(query);
   }
 
-  var url = Insights.queryBaseURL + this.urlPathPrefix + "query?nrql=" + query;
+  url = Insights.queryBaseURL + this.urlPathPrefix + 'query?nrql=' + query;
 
   request({
     method: 'GET',
     json: true,
     headers: {
-      "X-Query-Key": this.config.queryKey
+      'X-Query-Key': this.config.queryKey
     },
-    url: url,
+    url: url
   }, function(err, res, body){
     done(err, body);
   });

@@ -56,6 +56,13 @@ describe('node-insights', function(){
     expect(insights).to.respondTo('add');
   });
 
+  it('should be possible to get and set the property enabled', function(){
+    var insights = new Insights(config);
+    expect(insights.enabled).to.be.true;
+    insights.enabled = false;
+    expect(insights.enabled).to.be.false;
+  });
+
   it('should send data that is added', function(){
     var insights = new Insights(config);
     var scope = nock(Insights.collectorBaseURL).post('/v1/accounts/123456/events').reply(200, { });
