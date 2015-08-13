@@ -10,21 +10,28 @@ npm install node-insights --save
 
 ## usage
 
-Create an Insights instance and pass in an object with your New Relic app id, insert key, and query key.
+Create an Insights instance and pass in an object with your New Relic account id, insert key, and query key.
 
 For more information about NewRelic Insights Docs : https://docs.newrelic.com/docs/insights/new-relic-insights
 
-### note on arguments
+### configuration
 
-appId is an ID created by the user, they should be unique, and be a number.
+The constructor to the insights object accepts an object with the following properties:
 
-insertKey, queryKey, and accountId can all be found in one's NewRelic dashboard.
+  * accountId (string, required) - your newrelic insights account id
+  * insertKey (string, required) - your newrelic insert key
+  * queryKey (string, required) - your newrelic query key
+  * timerInterval (integer, default=10000) - the timer interval (in milliseconds) that is used for sending data
+  * maxPending (integer, default=1000) - the maximum number of items held in the queue before being sent
+  * defaultEventType (string, default='data') - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
+  * enabled (boolean, default=true) - enable/disable the sending of insights data.
+
+NOTE: insertKey, queryKey, and accountId can all be found in one's NewRelic dashboard.
 
 ```
 var Insights = require('node-insights');
 
 var insights = new Insights({
-  appId: <YOUR_APP_ID>,
   insertKey: '<YOUR_INSERT_KEY>',
   queryKey: '<YOUR_QUERY_KEY>',
   accountId: '<YOUR_ACCOUNT_ID>'
@@ -59,8 +66,10 @@ insights.query(q, function(err, responseBody) {
 
 ## adding data
 
-By default, adding data will start the send timer.
+By default, adding data will start the send timer (unless the enabled property is false).
 Data is held in the queue until either the number of items exceeds maxPending or the send timer goes off.
+
+NOTE: you may want to include an appId in your data. See [https://discuss.newrelic.com/t/distinguishing-between-apps-when-inserting-events/1515](here.)
 
 ### data format
 
@@ -71,6 +80,7 @@ Adding this data object:
 
 ```
 insights.add({
+  'appId': 42,
   'purchase': {
     "account":3,
     "amount":259.54
@@ -99,7 +109,6 @@ Array data flattens out too:
 but it is less pretty:
 ```
 {
-  'appId': 42,
   'eventType': 'data',
   'randomWords.0': 'card',
   'randomWords.1': 'bean',

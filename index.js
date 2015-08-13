@@ -231,7 +231,7 @@ Insights.prototype.nrql = function(params) {
  */
 Insights.prototype.where = function(clause) {
   var i, x, key, value, segment, quotedValues;
-  var quote = function(value) { return "'"+value+"'"; };
+  var quote = function(value) { return "'" + value + "'"; };
   var clauses = [];
   var segments = [];
 
