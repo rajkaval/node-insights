@@ -63,6 +63,20 @@ describe('node-insights', function(){
     expect(insights.enabled).to.be.false;
   });
 
+  it('should be possible to get and set the property insertKey', function(){
+    var insights = new Insights(config);
+    expect(insights.insertKey).to.eql(config.insertKey);
+    insights.insertKey = 'something';
+    expect(insights.insertKey).to.eql('something');
+  });
+
+  it('should be possible to get and set the property queryKey', function(){
+    var insights = new Insights(config);
+    expect(insights.queryKey).to.eql(config.queryKey);
+    insights.queryKey = 'something';
+    expect(insights.queryKey).to.eql('something');
+  });
+
   it('should send data that is added', function(){
     var insights = new Insights(config);
     var scope = nock(Insights.collectorBaseURL).post('/v1/accounts/123456/events').reply(200, { });

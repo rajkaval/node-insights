@@ -54,6 +54,25 @@ function Insights(config){
       this.config.enabled = val;
     }
   });
+
+  Object.defineProperty(this, 'queryKey', {
+    get: function () {
+      return this.config.queryKey;
+    },
+    set: function(val){
+      this.config.queryKey = val;
+    }
+  });
+
+  Object.defineProperty(this, 'insertKey', {
+    get: function () {
+      return this.config.insertKey;
+    },
+    set: function(val){
+      this.config.insertKey = val;
+    }
+  });
+
 }
 
 Insights.collectorBaseURL = 'https://insights-collector.newrelic.com';

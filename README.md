@@ -19,8 +19,8 @@ For more information about NewRelic Insights Docs : https://docs.newrelic.com/do
 The constructor to the insights object accepts an object with the following properties:
 
   * accountId (string, required) - your newrelic insights account id
-  * insertKey (string, required) - your newrelic insert key
-  * queryKey (string, required) - your newrelic query key
+  * insertKey (string, required if you are going to add or send data) - your newrelic insert key
+  * queryKey (string, required if you are going to query data) - your newrelic query key
   * timerInterval (integer, default=10000) - the timer interval (in milliseconds) that is used for sending data
   * maxPending (integer, default=1000) - the maximum number of items held in the queue before being sent
   * defaultEventType (string, default='data') - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
