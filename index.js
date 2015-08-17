@@ -109,25 +109,21 @@ Insights.prototype.send = function(){
   if (that.config.enabled && that.data.length > 0){
     bodyData = that.data;
     that.data = [];
-    try {
-      request({
-        method: 'POST',
-        json: true,
-        headers: {
-          'X-Insert-Key': this.config.insertKey
-        },
-        url: (Insights.collectorBaseURL + that.urlPathPrefix + 'events'),
-        body: bodyData
-      }, function(err, res, body){
-        if (err){
-          that.config.logger.error('Error sending to insights', err);
-        } else if (res){
-          that.config.logger.log('Insights response', res.statusCode, body);
-        }
-      });
-    } catch(x){
-      that.config.logger.error(x);
-    }
+    request({
+      method: 'POST',
+      json: true,
+      headers: {
+        'X-Insert-Key': this.config.insertKey
+      },
+      url: (Insights.collectorBaseURL + that.urlPathPrefix + 'events'),
+      body: bodyData
+    }, function(err, res, body){
+      if (err){
+        that.config.logger.error('Error sending to insights', err);
+      } else if (res){
+        that.config.logger.log('Insights response', res.statusCode, body);
+      }
+    });
   }
 };
 
@@ -161,28 +157,22 @@ Insights.prototype.add = function(data, eventType){
     throw new Error('Missing insert key');
   }
 
-  try {
+  insight = _.reduce(data, reducer(''), {
+    'eventType': eventType || that.config.defaultEventType
+  });
 
-    insight = _.reduce(data, reducer(''), {
-      'eventType': eventType || that.config.defaultEventType
-    });
+  if (insight.timestamp === undefined) {
+    insight.timestamp = Date.now();
+  }
 
-    if (insight.timestamp === undefined) {
-      insight.timestamp = Date.now();
-    }
+  that.config.logger.log('Insights data', insight);
+  that.data.push(insight);
 
-    that.config.logger.log('Insights data', insight);
-    that.data.push(insight);
-
-    if (that.data.length >= that.config.maxPending){
-      that.stop();
-      that.send();
-    } else {
-      that.start();
-    }
-  } catch(x){
-    that.config.logger.error('Insights Add Exception:', x);
-    that.data.length = 0;
+  if (that.data.length >= that.config.maxPending){
+    that.stop();
+    that.send();
+  } else {
+    that.start();
   }
 };
 
