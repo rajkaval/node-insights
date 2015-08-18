@@ -106,16 +106,16 @@ Insights.prototype.stop = function(){
 Insights.prototype.send = function(){
   var that = this;
   var bodyData;
-  if (that.config.enabled && that.data.length > 0){
-    bodyData = that.data;
-    that.data = [];
+  if (this.config.enabled && this.data.length > 0){
+    bodyData = this.data;
+    this.data = [];
     request({
       method: 'POST',
       json: true,
       headers: {
         'X-Insert-Key': this.config.insertKey
       },
-      url: (Insights.collectorBaseURL + that.urlPathPrefix + 'events'),
+      url: (Insights.collectorBaseURL + this.urlPathPrefix + 'events'),
       body: bodyData
     }, function(err, res, body){
       if (err){
@@ -127,12 +127,12 @@ Insights.prototype.send = function(){
   }
 };
 
-function reducer(prefix){
+function reducer(prefix, logger){
   return function(insight, value, key){
     if (_.isString(value) || _.isNumber(value)){
       insight[prefix + key] = value;
     } else if (_.isPlainObject(value) || _.isArray(value)){
-      _.reduce(value, reducer(prefix + key + '.'), insight);
+      _.reduce(value, reducer(prefix + key + '.', logger), insight);
     } else if (_.isBoolean(value) || _.isDate(value)){
       insight[prefix + key] = value.toString();
     } else {
@@ -150,29 +150,28 @@ function reducer(prefix){
 * @param {string} [eventType] - event type to associate with data
 */
 Insights.prototype.add = function(data, eventType){
-  var that = this;
   var insight;
 
   if (_.isEmpty(this.config.insertKey)){
     throw new Error('Missing insert key');
   }
 
-  insight = _.reduce(data, reducer(''), {
-    'eventType': eventType || that.config.defaultEventType
+  insight = _.reduce(data, reducer('', this.config.logger), {
+    'eventType': eventType || this.config.defaultEventType
   });
 
   if (insight.timestamp === undefined) {
     insight.timestamp = Date.now();
   }
 
-  that.config.logger.log('Insights data', insight);
-  that.data.push(insight);
+  this.config.logger.log('Insights data', insight);
+  this.data.push(insight);
 
-  if (that.data.length >= that.config.maxPending){
-    that.stop();
-    that.send();
+  if (this.data.length >= this.config.maxPending){
+    this.stop();
+    this.send();
   } else {
-    that.start();
+    this.start();
   }
 };
 
