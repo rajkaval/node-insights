@@ -46,6 +46,11 @@ describe('node-insights', function(){
     expect(insights).to.respondTo('stop');
   });
 
+  it('should have the method finish', function(){
+    var insights = new Insights(config);
+    expect(insights).to.respondTo('finish');
+  });
+
   it('should have the method send', function(){
     var insights = new Insights(config);
     expect(insights).to.respondTo('send');
@@ -302,6 +307,21 @@ describe('node-insights', function(){
     insights.stop();
     setTimeout(function(){
       expect(scope.isDone()).to.be.false;
+    }, 1000);
+  });
+
+  it('should be finishable', function(){
+    var scope = nock(Insights.collectorBaseURL).post('/v1/accounts/123456/events').reply(200, { });
+    var insights = new Insights(config);
+    insights.add({
+      'apples': 42
+    });
+    insights.finish();
+    setTimeout(function(){
+      expect(scope.isDone()).to.be.false;
+    }, 100);
+    setTimeout(function(){
+      expect(scope.isDone()).to.be.true;
     }, 1000);
   });
 

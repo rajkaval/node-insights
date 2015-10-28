@@ -69,6 +69,8 @@ insights.query(q, function(err, responseBody) {
 By default, adding data will start the send timer (unless the enabled property is false).
 Data is held in the queue until either the number of items exceeds maxPending or the send timer goes off.
 
+Call .finish() after the final call to .add() in order to stop the send timer after the queue is flushed.
+
 NOTE: you may want to include an appId in your data. See [here](https://discuss.newrelic.com/t/distinguishing-between-apps-when-inserting-events/1515])
 
 ### data format
