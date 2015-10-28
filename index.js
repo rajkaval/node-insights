@@ -34,6 +34,7 @@ function Insights(config){
     queryKey: '',
     timerInterval: 10000,
     maxPending: 1000,
+    shouldFinish: false,
     defaultEventType: 'data'
   }, config);
 
@@ -101,6 +102,15 @@ Insights.prototype.stop = function(){
 };
 
 /**
+* Stop the timer after flushing.
+*/
+Insights.prototype.finish = function(){
+  if (this.timerId){
+    this.shouldFinish = true;
+  }
+};
+
+/**
  * Send accumulated insights data to new relic (if enabled)
  */
 Insights.prototype.send = function(){
@@ -122,6 +132,11 @@ Insights.prototype.send = function(){
         that.config.logger.error('Error sending to insights', err);
       } else if (res){
         that.config.logger.log('Insights response', res.statusCode, body);
+      }
+
+      if (that.shouldFinish) {
+        that.stop();
+        that.shouldFinish = false;
       }
     });
   }
