@@ -133,13 +133,15 @@ Insights.prototype.send = function(done){
         that.config.logger.error('Error sending to insights', err);
       } else if (res){
         that.config.logger.log('Insights response', res.statusCode, body);
-        typeof done === 'function' && done(err, body);
       }
 
       if (that.shouldFinish) {
         that.stop();
         that.shouldFinish = false;
       }
+
+      typeof done === 'function' && done(err, body);
+
     });
   }
 };
