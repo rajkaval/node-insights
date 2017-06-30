@@ -113,7 +113,7 @@ Insights.prototype.finish = function(){
 /**
  * Send accumulated insights data to new relic (if enabled)
  */
-Insights.prototype.send = function(){
+Insights.prototype.send = function(done){
   var that = this;
   var bodyData;
   if (this.config.enabled && this.data.length > 0){
@@ -132,6 +132,7 @@ Insights.prototype.send = function(){
         that.config.logger.error('Error sending to insights', err);
       } else if (res){
         that.config.logger.log('Insights response', res.statusCode, body);
+        done()
       }
 
       if (that.shouldFinish) {
