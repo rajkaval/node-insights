@@ -112,6 +112,7 @@ Insights.prototype.finish = function(){
 
 /**
  * Send accumulated insights data to new relic (if enabled)
+ * @param {function} done - callback
  */
 Insights.prototype.send = function(done){
   var that = this;
@@ -132,7 +133,7 @@ Insights.prototype.send = function(done){
         that.config.logger.error('Error sending to insights', err);
       } else if (res){
         that.config.logger.log('Insights response', res.statusCode, body);
-        done()
+        typeof done === 'function' && done()
       }
 
       if (that.shouldFinish) {
