@@ -112,8 +112,9 @@ Insights.prototype.finish = function(){
 
 /**
  * Send accumulated insights data to new relic (if enabled)
+ * @param {function} done - callback
  */
-Insights.prototype.send = function(){
+Insights.prototype.send = function(done){
   var that = this;
   var bodyData;
   if (this.config.enabled && this.data.length > 0){
@@ -138,6 +139,9 @@ Insights.prototype.send = function(){
         that.stop();
         that.shouldFinish = false;
       }
+
+      typeof done === 'function' && done(err, body);
+
     });
   }
 };
