@@ -28,6 +28,8 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+var https = require('https');
+var zlib = require('zlib');
 var _ = require('lodash');
 var request = require('request');
 var logger = console;
@@ -43,6 +45,7 @@ var logger = console;
  * @param {integer} [config.maxPending=1000] - the maximum number of items held in the queue before being sent
  * @param {string} [config.defaultEventType='data'] - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
  * @param {boolean} [config.enabled=true] - enable/disable the sending of insights data.
+ * @param {boolean} [config.gzip=false] - enable/disable the sending of insights data zipped via gzip.
  *
  * @example
  *    new Insights({
@@ -62,7 +65,9 @@ function Insights(config){
     queryKey: '',
     timerInterval: 10000,
     maxPending: 1000,
-    defaultEventType: 'data'
+    shouldFinish: false,
+    defaultEventType: 'data',
+    gzip: false
   }, config);
 
   if(_.isEmpty(this.config.accountId)){
@@ -82,9 +87,29 @@ function Insights(config){
       this.config.enabled = val;
     }
   });
+
+  Object.defineProperty(this, 'queryKey', {
+    get: function () {
+      return this.config.queryKey;
+    },
+    set: function(val){
+      this.config.queryKey = val;
+    }
+  });
+
+  Object.defineProperty(this, 'insertKey', {
+    get: function () {
+      return this.config.insertKey;
+    },
+    set: function(val){
+      this.config.insertKey = val;
+    }
+  });
+
 }
 
-Insights.collectorBaseURL = 'https://insights-collector.newrelic.com';
+Insights.collectorHost = 'insights-collector.newrelic.com';
+Insights.collectorBaseURL = 'https://' + Insights.collectorHost;
 Insights.queryBaseURL = 'https://insights-api.newrelic.com';
 
 
@@ -110,42 +135,88 @@ Insights.prototype.stop = function(){
 };
 
 /**
+* Stop the timer after flushing.
+*/
+Insights.prototype.finish = function(){
+  if (this.timerId){
+    this.shouldFinish = true;
+  }
+};
+
+/**
  * Send accumulated insights data to new relic (if enabled)
+ * @param {function} done - callback
  */
-Insights.prototype.send = function(){
+Insights.prototype.send = function(done){
   var that = this;
   var bodyData;
-  if (that.config.enabled &amp;&amp; that.data.length > 0){
-    bodyData = that.data;
-    that.data = [];
-    try {
-      request({
-        method: 'POST',
-        json: true,
-        headers: {
-          'X-Insert-Key': this.config.insertKey
-        },
-        url: (Insights.collectorBaseURL + that.urlPathPrefix + 'events'),
-        body: bodyData
-      }, function(err, res, body){
-        if (err){
-          that.config.logger.error('Error sending to insights', err);
-        } else if (res){
-          that.config.logger.log('Insights response', res.statusCode, body);
-        }
-      });
-    } catch(x){
-      that.config.logger.error(x);
+  if (this.config.enabled &amp;&amp; this.data.length > 0){
+    bodyData = this.data;
+    this.data = [];
+    if (this.config.gzip) {
+        zlib.gzip(JSON.stringify(bodyData), function (err, buffer) {
+            var req = https.request({
+                hostname: Insights.collectorHost,
+                path: that.urlPathPrefix + 'events',
+                method: 'POST',
+                headers: {
+                    'X-Insert-Key': that.config.insertKey,
+                    'Content-Encoding': 'gzip'
+                }
+            }, function(res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    that.config.logger.log('(data zipped) Insights response', res.statusCode, chunk);
+
+                  if (that.shouldFinish) {
+                    that.stop();
+                    that.shouldFinish = false;
+                  }
+
+                  typeof done === 'function' &amp;&amp; done(err, chunk);
+                });
+            });
+            req.on('error', function(e) {
+                that.config.logger.error('Error sending to insights (zipped)', e.message);
+            });
+            req.write(buffer); // send compressed data
+            req.end();
+        });
+    }
+    else {
+        request({
+          method: 'POST',
+          json: true,
+          headers: {
+            'X-Insert-Key': this.config.insertKey
+          },
+          url: (Insights.collectorBaseURL + this.urlPathPrefix + 'events'),
+          body: bodyData
+        }, function(err, res, body){
+          if (err){
+            that.config.logger.error('Error sending to insights', err);
+          } else if (res){
+            that.config.logger.log('Insights response', res.statusCode, body);
+          }
+
+          if (that.shouldFinish) {
+            that.stop();
+            that.shouldFinish = false;
+          }
+
+          typeof done === 'function' &amp;&amp; done(err, body);
+
+        });
     }
   }
 };
 
-function reducer(prefix){
+function reducer(prefix, logger){
   return function(insight, value, key){
     if (_.isString(value) || _.isNumber(value)){
       insight[prefix + key] = value;
     } else if (_.isPlainObject(value) || _.isArray(value)){
-      _.reduce(value, reducer(prefix + key + '.'), insight);
+      _.reduce(value, reducer(prefix + key + '.', logger), insight);
     } else if (_.isBoolean(value) || _.isDate(value)){
       insight[prefix + key] = value.toString();
     } else {
@@ -163,35 +234,28 @@ function reducer(prefix){
 * @param {string} [eventType] - event type to associate with data
 */
 Insights.prototype.add = function(data, eventType){
-  var that = this;
   var insight;
 
   if (_.isEmpty(this.config.insertKey)){
     throw new Error('Missing insert key');
   }
 
-  try {
+  insight = _.reduce(data, reducer('', this.config.logger), {
+    'eventType': eventType || this.config.defaultEventType
+  });
 
-    insight = _.reduce(data, reducer(''), {
-      'eventType': eventType || that.config.defaultEventType
-    });
+  if (insight.timestamp === undefined) {
+    insight.timestamp = Date.now();
+  }
 
-    if (insight.timestamp === undefined) {
-      insight.timestamp = Date.now();
-    }
+  this.config.logger.log('Insights data', insight);
+  this.data.push(insight);
 
-    that.config.logger.log('Insights data', insight);
-    that.data.push(insight);
-
-    if (that.data.length >= that.config.maxPending){
-      that.stop();
-      that.send();
-    } else {
-      that.start();
-    }
-  } catch(x){
-    that.config.logger.error('Insights Add Exception:', x);
-    that.data.length = 0;
+  if (this.data.length >= this.config.maxPending){
+    this.stop();
+    this.send();
+  } else {
+    this.start();
   }
 };
 
@@ -259,7 +323,7 @@ Insights.prototype.nrql = function(params) {
  */
 Insights.prototype.where = function(clause) {
   var i, x, key, value, segment, quotedValues;
-  var quote = function(value) { return "'"+value+"'"; };
+  var quote = function(value) { return "'" + value + "'"; };
   var clauses = [];
   var segments = [];
 
@@ -361,7 +425,7 @@ module.exports = Insights;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Aug 12 2015 17:44:19 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 09 2019 22:29:48 GMT-0800 (Pacific Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

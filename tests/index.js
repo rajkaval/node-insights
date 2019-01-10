@@ -123,11 +123,9 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
+      expect(body).to.have.length(1);
 
-      var parsedBody = JSON.parse(body);
-      expect(parsedBody).to.have.length(1);
-
-      var processedInsight = parsedBody[0];
+      var processedInsight = body[0];
       expect(Object.keys(processedInsight).sort()).to.eql(['eventType', 'purchase.account', 'purchase.amount', 'timestamp'].sort());
       expect(processedInsight.eventType).to.eql('purchase');
       expect(processedInsight['purchase.account']).to.eql(3);
@@ -154,11 +152,9 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
+      expect(body).to.have.length(1);
 
-      var parsedBody = JSON.parse(body);
-      expect(parsedBody).to.have.length(1);
-
-      var parsedInsight = parsedBody[0];
+      var parsedInsight = body[0];
       expect(Object.keys(parsedInsight).sort()).to.eql(['eventType', 'randomWords.0', 'randomWords.1', 'randomWords.2', 'randomWords.3', 'timestamp']);
       expect(parsedInsight.eventType).to.eql('test-data');
       expect(parsedInsight['randomWords.0']).to.eql('card');
@@ -229,11 +225,9 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
+      expect(body).to.have.length(1);
 
-      var parsedBody = JSON.parse(body);
-      expect(parsedBody).to.have.length(1);
-
-      var parsedInsight = parsedBody[0];
+      var parsedInsight = body[0];
       expect(Object.keys(parsedInsight).sort()).to.eql([
         'eventType',
         'timestamp',
@@ -285,11 +279,9 @@ describe('node-insights', function(){
     insights.send();
     setTimeout(function(){
       expect(scope.isDone()).to.be.true;
+      expect(body).to.have.length(1);
 
-      var parsedBody = JSON.parse(body);
-      expect(parsedBody).to.have.length(1);
-
-      var parsedInsight = parsedBody[0];
+      var parsedInsight = body[0];
       expect(Object.keys(parsedInsight).sort()).to.eql(['eventType', 'timestamp']);
       expect(parsedInsight.eventType).to.eql('test-data');
       expect(parsedInsight.timestamp).to.eql(5)

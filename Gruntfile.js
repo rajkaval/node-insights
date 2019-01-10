@@ -1,5 +1,6 @@
 'use strict';
 
+process.env.NODE_ENV = 'test';
 var path = require('path');
 
 module.exports = function (grunt) {
@@ -17,14 +18,6 @@ module.exports = function (grunt) {
       docs: ['./docs'],
       coverage: {
         src: ['./coverage']
-      }
-    },
-
-    env : {
-      options : {
-      },
-      test : {
-        NODE_ENV : 'test'
       }
     },
 
@@ -74,14 +67,13 @@ module.exports = function (grunt) {
 
   });
 
-  grunt.registerTask('coverage', ['clean:coverage', 'env:test', 'exec:istanbul']);
+  grunt.registerTask('coverage', ['clean:coverage', 'exec:istanbul']);
   grunt.registerTask('docs', [ 'clean:docs', 'jsdoc' ]);
 
   grunt.registerTask('test', 'Run Tests', function () {
-    grunt.task.run(['env:test', 'exec:mocha:all']);
+    grunt.task.run(['exec:mocha:all']);
   });
 
   grunt.registerTask('default', ['test']);
 
 };
-

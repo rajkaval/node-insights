@@ -25,6 +25,7 @@ The constructor to the insights object accepts an object with the following prop
   * maxPending (integer, default=1000) - the maximum number of items held in the queue before being sent
   * defaultEventType (string, default='data') - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
   * enabled (boolean, default=true) - enable/disable the sending of insights data.
+  * gzip (boolean, default=false) - enable/disable the sending of insights data zipped via gzip.
 
 NOTE: insertKey, queryKey, and accountId can all be found in one's NewRelic dashboard.
 
