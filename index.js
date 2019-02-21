@@ -1,5 +1,7 @@
 'use strict';
 
+var https = require('https');
+var zlib = require('zlib');
 var _ = require('lodash');
 var request = require('request');
 var logger = console;
@@ -15,6 +17,7 @@ var logger = console;
  * @param {integer} [config.maxPending=1000] - the maximum number of items held in the queue before being sent
  * @param {string} [config.defaultEventType='data'] - when adding data, you can specify the eventType that is sent to New Relic.  If you don't specify the eventType, the defaultEventType is used.
  * @param {boolean} [config.enabled=true] - enable/disable the sending of insights data.
+ * @param {boolean} [config.gzip=false] - enable/disable the sending of insights data zipped via gzip.
  *
  * @example
  *    new Insights({
@@ -35,7 +38,8 @@ function Insights(config){
     timerInterval: 10000,
     maxPending: 1000,
     shouldFinish: false,
-    defaultEventType: 'data'
+    defaultEventType: 'data',
+    gzip: false
   }, config);
 
   if(_.isEmpty(this.config.accountId)){
@@ -76,7 +80,8 @@ function Insights(config){
 
 }
 
-Insights.collectorBaseURL = 'https://insights-collector.newrelic.com';
+Insights.collectorHost = 'insights-collector.newrelic.com';
+Insights.collectorBaseURL = 'https://' + Insights.collectorHost;
 Insights.queryBaseURL = 'https://insights-api.newrelic.com';
 
 
@@ -120,29 +125,61 @@ Insights.prototype.send = function(done){
   if (this.config.enabled && this.data.length > 0){
     bodyData = this.data;
     this.data = [];
-    request({
-      method: 'POST',
-      json: true,
-      headers: {
-        'X-Insert-Key': this.config.insertKey
-      },
-      url: (Insights.collectorBaseURL + this.urlPathPrefix + 'events'),
-      body: bodyData
-    }, function(err, res, body){
-      if (err){
-        that.config.logger.error('Error sending to insights', err);
-      } else if (res){
-        that.config.logger.log('Insights response', res.statusCode, body);
-      }
+    if (this.config.gzip) {
+        zlib.gzip(JSON.stringify(bodyData), function (err, buffer) {
+            var req = https.request({
+                hostname: Insights.collectorHost,
+                path: that.urlPathPrefix + 'events',
+                method: 'POST',
+                headers: {
+                    'X-Insert-Key': that.config.insertKey,
+                    'Content-Encoding': 'gzip'
+                }
+            }, function(res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    that.config.logger.log('(data zipped) Insights response', res.statusCode, chunk);
 
-      if (that.shouldFinish) {
-        that.stop();
-        that.shouldFinish = false;
-      }
+                  if (that.shouldFinish) {
+                    that.stop();
+                    that.shouldFinish = false;
+                  }
 
-      typeof done === 'function' && done(err, body);
+                  typeof done === 'function' && done(err, chunk);
+                });
+            });
+            req.on('error', function(e) {
+                that.config.logger.error('Error sending to insights (zipped)', e.message);
+            });
+            req.write(buffer); // send compressed data
+            req.end();
+        });
+    }
+    else {
+        request({
+          method: 'POST',
+          json: true,
+          headers: {
+            'X-Insert-Key': this.config.insertKey
+          },
+          url: (Insights.collectorBaseURL + this.urlPathPrefix + 'events'),
+          body: bodyData
+        }, function(err, res, body){
+          if (err){
+            that.config.logger.error('Error sending to insights', err);
+          } else if (res){
+            that.config.logger.log('Insights response', res.statusCode, body);
+          }
 
-    });
+          if (that.shouldFinish) {
+            that.stop();
+            that.shouldFinish = false;
+          }
+
+          typeof done === 'function' && done(err, body);
+
+        });
+    }
   }
 };
 

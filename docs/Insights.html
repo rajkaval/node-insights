@@ -28,9 +28,7 @@
 
 <header>
     
-        <h2>
-        Insights
-        </h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Insights<span class="signature">(config)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -42,7 +40,9 @@
 
     
 
+    
     <h4 class="name" id="Insights"><span class="type-signature"></span>new Insights<span class="signature">(config)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -389,6 +389,45 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>gzip</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">enable/disable the sending of insights data zipped via gzip.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -433,7 +472,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line27">line 27</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -443,6 +482,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -477,7 +518,9 @@
 
     
 
-     
+    
+
+    
 
     
 
@@ -491,7 +534,9 @@
 
     
 
+    
     <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(data, eventType<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -635,7 +680,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line137">line 137</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -661,12 +706,102 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
 
 
+
+
         
             
 
     
 
+    
+    <h4 class="name" id="finish"><span class="type-signature"></span>finish<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Stop the timer after flushing.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line112">line 112</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="nrql"><span class="type-signature"></span>nrql<span class="signature">(params)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -766,7 +901,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line183">line 183</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line247">line 247</a>
     </li></ul></dd>
     
 
@@ -776,6 +911,8 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
     
 </dl>
+
+
 
 
 
@@ -809,7 +946,9 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
     
 
+    
     <h4 class="name" id="query"><span class="type-signature"></span>query<span class="signature">(query, done)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -935,7 +1074,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line290">line 290</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line354">line 354</a>
     </li></ul></dd>
     
 
@@ -961,12 +1100,16 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">(done)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -982,6 +1125,55 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>done</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1017,7 +1209,7 @@ It is sent when the queue reaches a max size or a period of time has elapsed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line87">line 87</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line122">line 122</a>
     </li></ul></dd>
     
 
@@ -1043,12 +1235,16 @@ It is sent when the queue reaches a max size or a period of time has elapsed
 
 
 
+
+
         
             
 
     
 
+    
     <h4 class="name" id="start"><span class="type-signature"></span>start<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -1100,7 +1296,7 @@ this is called implicitly when data is added via the add method
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line67">line 67</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -1126,12 +1322,16 @@ this is called implicitly when data is added via the add method
 
 
 
+
+
         
             
 
     
 
+    
     <h4 class="name" id="stop"><span class="type-signature"></span>stop<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -1183,7 +1383,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line77">line 77</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -1209,12 +1409,16 @@ this is called implicitly when the amount of data exceeds maxPending and the que
 
 
 
+
+
         
             
 
     
 
+    
     <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -1265,7 +1469,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line232">line 232</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line296">line 296</a>
     </li></ul></dd>
     
 
@@ -1275,6 +1479,8 @@ this is called implicitly when the amount of data exceeds maxPending and the que
 
     
 </dl>
+
+
 
 
 
@@ -1313,7 +1519,7 @@ this is called implicitly when the amount of data exceeds maxPending and the que
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Aug 12 2015 17:44:19 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 09 2019 22:29:48 GMT-0800 (Pacific Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
