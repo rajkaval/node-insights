@@ -138,7 +138,7 @@ Insights.prototype.send = function(done){
             }, function(res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
-                    that.config.logger.log('(data zipped) Insights response', res.statusCode, chunk);
+                   if(that.config.logger) that.config.logger.log('(data zipped) Insights response', res.statusCode, chunk);
 
                   if (that.shouldFinish) {
                     that.stop();
@@ -149,7 +149,7 @@ Insights.prototype.send = function(done){
                 });
             });
             req.on('error', function(e) {
-                that.config.logger.error('Error sending to insights (zipped)', e.message);
+                if(that.config.logger) that.config.logger.error('Error sending to insights (zipped)', e.message);
             });
             req.write(buffer); // send compressed data
             req.end();
@@ -166,9 +166,9 @@ Insights.prototype.send = function(done){
           body: bodyData
         }, function(err, res, body){
           if (err){
-            that.config.logger.error('Error sending to insights', err);
+            if(that.config.logger) that.config.logger.error('Error sending to insights', err);
           } else if (res){
-            that.config.logger.log('Insights response', res.statusCode, body);
+            if(that.config.logger) that.config.logger.log('Insights response', res.statusCode, body);
           }
 
           if (that.shouldFinish) {
@@ -193,7 +193,7 @@ function reducer(prefix, logger){
       insight[prefix + key] = value.toString();
     } else {
       //ignore functions, nulls, undefineds
-      logger.warn('not reducing', prefix, key, value);
+     if(logger)  logger.warn('not reducing', prefix, key, value);
     }
     return insight;
   };
@@ -220,7 +220,7 @@ Insights.prototype.add = function(data, eventType){
     insight.timestamp = Date.now();
   }
 
-  this.config.logger.log('Insights data', insight);
+  if(this.config.logger) this.config.logger.log('Insights data', insight);
   this.data.push(insight);
 
   if (this.data.length >= this.config.maxPending){
